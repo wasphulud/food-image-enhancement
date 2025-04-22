@@ -35,14 +35,8 @@ A tool to enhance food images by detecting food items, adjusting composition, an
    pip install -r requirements.txt
    ```
 
-2. **Install dependencies**:
 
-   ```bash
-   pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu117  # Adjust CUDA version as needed
-   pip install numpy pillow diffusers transformers lang-sam
-   ```
-
-3. **Authenticate with Hugging Face** (for Yahoo model access):
+2. **Authenticate with Hugging Face** (for Yahoo model access):
    - Create a [Hugging Face token](https://huggingface.co/settings/tokens).
    - Run:
      ```bash
