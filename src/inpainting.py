@@ -140,3 +140,48 @@ class YahooInpaintingPipeline:
         """Releases pipeline resources."""
         del self.pipe
         torch.cuda.empty_cache()
+
+
+class InpaintingStrategy:
+    """Base class for inpainting strategies."""
+
+    def inpaint(
+        self, prompt: str, image: Image.Image, mask: Image.Image
+    ) -> Image.Image:
+        raise NotImplementedError("Inpainting method not implemented.")
+
+
+class StabilityAIInpaintingStrategy(InpaintingStrategy):
+    """Inpainting strategy using Stability AI."""
+
+    def __init__(self, model_name: str):
+        self.inpainter = InpaintingPipeline(model_name)
+
+    def inpaint(
+        self, prompt: str, image: Image.Image, mask: Image.Image
+    ) -> Image.Image:
+        result = self.inpainter(prompt=prompt, image=image, mask=mask)
+        self.inpainter.cleanup()
+        return result
+
+
+class YahooInpaintingStrategy(InpaintingStrategy):
+    """Inpainting strategy using Yahoo's model."""
+
+    def __init__(self):
+        self.inpainter = YahooInpaintingPipeline()
+
+    def inpaint(
+        self, prompt: str, image: Image.Image, mask: Image.Image
+    ) -> Image.Image:
+        result = self.inpainter(prompt=prompt, image=image, mask=mask)
+        self.inpainter.cleanup()
+        return result
+
+
+def get_inpainting_strategy(model_name: str) -> InpaintingStrategy:
+    """Factory method to get the appropriate inpainting strategy."""
+    if model_name.startswith("st"):
+        return StabilityAIInpaintingStrategy(model_name)
+    else:
+        return YahooInpaintingStrategy()
