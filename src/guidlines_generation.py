@@ -1,5 +1,4 @@
 from typing import Dict, List
-from PIL import Image
 
 import numpy as np
 import torch
@@ -15,13 +14,20 @@ class CompositionValidator:
         max_width: int = 1000,
         max_coverage: float = 0.6,
         rule_threshold: float = 0.15,
-    ):
+    ) -> None:
         self.max_width = max_width
         self.max_coverage = max_coverage
         self.rule_threshold = rule_threshold
 
-    def _get_food_center(self, mask: Image.Image) -> tuple:
-        """Get center coordinates of food area from mask"""
+    def _get_food_center(self, mask: Image.Image) -> tuple[int, int]:
+        """Get center coordinates of food area from mask.
+
+        Args:
+            mask (Image.Image): A binary mask image where food areas are highlighted.
+
+        Returns:
+            tuple[int, int]: The (x, y) coordinates of the food center.
+        """
         if not isinstance(mask, Image.Image):
             raise ValueError("Mask must be a PIL Image object")
 
@@ -34,8 +40,18 @@ class CompositionValidator:
             )  # Default to center if no food found
         return (int(np.mean(xs)), int(np.mean(ys)))
 
-    def _calculate_padding(self, orig_size: tuple, food_center: tuple) -> tuple:
-        """Calculate padding to achieve 5:4 ratio and rule of thirds positioning"""
+    def _calculate_padding(
+        self, orig_size: tuple[int, int], food_center: tuple[int, int]
+    ) -> tuple[int, int, int, int]:
+        """Calculate padding to achieve 5:4 ratio and rule of thirds positioning.
+
+        Args:
+            orig_size (tuple[int, int]): The original size of the image as (width, height).
+            food_center (tuple[int, int]): The (x, y) coordinates of the food center.
+
+        Returns:
+            tuple[int, int, int, int]: The padding values in the order (left, top, right, bottom).
+        """
         orig_width, orig_height = orig_size
 
         # Calculate target dimensions
@@ -67,8 +83,18 @@ class CompositionValidator:
             pad_right = pad_total - pad_left
             return (pad_left, 0, pad_right, 0)
 
-    def apply_composition(self, image: Image.Image, mask: Image.Image) -> tuple:
-        """Main composition method"""
+    def apply_composition(
+        self, image: Image.Image, mask: Image.Image
+    ) -> tuple[Image.Image, Image.Image]:
+        """Main composition method.
+
+        Args:
+            image (Image.Image): The original image to be processed.
+            mask (Image.Image): The binary mask image corresponding to the original image.
+
+        Returns:
+            tuple[Image.Image, Image.Image]: The processed image and mask after applying composition rules.
+        """
         # Type validation
         if not isinstance(image, Image.Image) or not isinstance(mask, Image.Image):
             raise ValueError(
