@@ -133,6 +133,7 @@ class YahooInpaintingPipeline:
                 num_inference_steps=20,
                 guess_mode=False,
                 controlnet_conditioning_scale=1.0,
+                negative_prompt="no plastic container, no text, no background people, no restaurent background, no background items",
             ).images[0]
 
     def cleanup(self) -> None:

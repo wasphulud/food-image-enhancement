@@ -73,7 +73,7 @@ def process_image(image_path: str, prompt: str) -> Image.Image:
         # --- IMAGE UNDERSTANDING ---
         understanding = ImageUnderstanding()
         masks = understanding.predict_masks(
-            orig_image, ["food", "snack", "vegetables", "plate"]
+            orig_image, ["food", "snack", "vegetables"]
         )
         composite_mask = understanding.create_composite_mask(masks)
         understanding.cleanup()
@@ -174,7 +174,7 @@ if __name__ == "__main__":
 
     prompt = (
         "the dish is placed on a circular white plate. "
-        "the plate is placed on a wooden table. Clean table"
+        "the plate is placed on a marble table. Clean table"
     )
     process_images(
         input_dir=args.input,
