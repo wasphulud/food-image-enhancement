@@ -38,6 +38,7 @@ def process_image(image_path: str, prompt: str) -> Image.Image:
         final_img, final_mask = composer.apply_composition(orig_image, composite_mask)
 
         # --- INPAINTING ---
+        #crapy way to quickly switch between the two inpainting pipeline: a better way it to use the if/else or strategy pattern+registry
         inpainting_model = "stabilityai/stable-diffusion-2-inpainting"
         inpainting_model = "yah"
         if inpainting_model[:2] == "st":
