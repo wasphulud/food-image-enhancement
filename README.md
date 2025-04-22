@@ -13,7 +13,7 @@ A tool to enhance food images by detecting food items, adjusting composition, an
 
 ## Data Flow
 
-![Data Flow](src/dataflow.png)
+![Data Flow](dataflow.png)
 
 ---
 
