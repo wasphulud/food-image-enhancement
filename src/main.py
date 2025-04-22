@@ -20,51 +20,61 @@ def process_image(image_path: str, prompt: str) -> Image.Image:
     Returns:
         Image.Image: The processed image after inpainting.
     """
-    # Load original image
-    orig_image = Image.open(image_path).convert("RGB")
+    # Initialize all variables to None to avoid NameError
+    orig_image = None
+    masks = None
+    composite_mask = None
+    final_img = None
+    final_mask = None
+    understanding = None
+    composer = None
+    strategy = None
     result = None
 
     try:
         # --- IMAGE UNDERSTANDING ---
+        orig_image = Image.open(image_path).convert("RGB")
         understanding = ImageUnderstanding()
         masks = understanding.predict_masks(orig_image, ["food", "snack", "vegetables"])
         composite_mask = understanding.create_composite_mask(masks)
-        understanding.cleanup()
 
         # --- COMPOSITION VALIDATION ---
         composer = CompositionValidator()
         final_img, final_mask = composer.apply_composition(orig_image, composite_mask)
 
         # --- INPAINTING ---
-        inpainting_model = (
-            "stabilityai/stable-diffusion-2-inpainting"  # Example model name
-        )
+        inpainting_model = "stabilityai/stable-diffusion-2-inpainting"
         strategy = get_inpainting_strategy(inpainting_model)
         result = strategy.inpaint(prompt=prompt, image=final_img, mask=final_mask)
 
         return result
 
     finally:
-        # Delete all large objects and free GPU
-        for obj in [
-            orig_image,
-            masks,
-            composite_mask,
-            final_img,
-            final_mask,
-            understanding,
-            composer,
-            strategy,
-            result,
-        ]:
+        # Explicitly delete each variable by name
+        variables_to_delete = [
+            "orig_image",
+            "masks",
+            "composite_mask",
+            "final_img",
+            "final_mask",
+            "understanding",
+            "composer",
+            "strategy",
+            "result",
+        ]
+        for var_name in variables_to_delete:
             try:
-                del obj
+                exec(f"del {var_name}", globals(), locals())
             except NameError:
                 pass
 
-        # force Python GC
+        # Force cleanup if objects have specific methods (e.g., for GPU release)
+        if understanding is not None:
+            understanding.cleanup()
+        if strategy is not None:
+            strategy.cleanup()  # Hypothetical method
+
         gc.collect()
-        # force CUDA to free everything
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
